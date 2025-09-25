@@ -8,8 +8,7 @@ router
   .route("/profile")
   .get(protect, profile)
   .put(protect, updateProfile)
-//   .post((req, res) => res.send("Create a user"))
-//   .delete((req, res) => res.send("Delete users"));
+
 
 
 

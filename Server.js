@@ -11,10 +11,13 @@ app.use(cors())
 
 connectDB()
 
+
 // routes------------------------------------------------------------------
 
-app.use('/api/auth', require('./routes/authRoute'))
+app.use('/api/auth',  require('./routes/authRoute'))
 app.use('/api/jobs', require('./routes/jobRoute'))
+app.use('/api/user',  require('./routes/userRoute'))
+
 
 
 

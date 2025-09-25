@@ -9,8 +9,9 @@ const userSchema = new mongoose.Schema({
     enum: ["jobseeker", "employer"],
     default: "jobseeker",
   },
-
   refreshToken: { type: String },
+   isVerified: { type: Boolean, default: false },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('user', userSchema)

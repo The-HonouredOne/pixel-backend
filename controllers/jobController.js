@@ -62,6 +62,7 @@ exports.getJobsbyId = async (req, res) => {
 exports.updateJob = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("hello")
     const updates = req.body;
 
 
