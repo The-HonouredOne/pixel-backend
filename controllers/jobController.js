@@ -1,8 +1,9 @@
 const { json } = require('express');
-const Job = require('../models/Job');
+// const Job = require('../models/Job');
 const JobModel = require('../models/Job')
+const Application = require('../models/Application');
 
-
+// ------------------------create a job---------------------
 exports.createJob = async (req, res) => {
   try {
     const { title, company, description, location, salary } = req.body;
@@ -24,9 +25,7 @@ exports.createJob = async (req, res) => {
   }
 };
 
-
-
-
+// -----------get all jobs------------------------
 exports.getAllJobs = async (req, res) => {
   try {
     const alljobs = await JobModel.find({});
@@ -43,6 +42,8 @@ exports.getAllJobs = async (req, res) => {
     res.status(500).json({ status: false, msg: "Server error" });
   }
 };
+
+// ---------------------------get job by id----------------------------
 exports.getJobsbyId = async (req, res) => {
   try {
     const { id } = req.params
@@ -59,6 +60,8 @@ exports.getJobsbyId = async (req, res) => {
     res.status(500).json({ status: false, msg: "Server error" });
   }
 };
+
+// -------------------------update a job ---------------------
 exports.updateJob = async (req, res) => {
   try {
     const { id } = req.params;
@@ -84,17 +87,20 @@ exports.updateJob = async (req, res) => {
 };
 
 
-
+// ----------------------------delete a job------------------------------
 exports.deleteJob = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id)
 
     let filter = { _id: id };
 
 
-    if (req.user.role === "employer") {
+    if (req.user.role === "employ") {
       filter.createdBy = req.user.id;
     }
+
+    console.log(req.user.id)
 
 
 
@@ -117,32 +123,84 @@ exports.deleteJob = async (req, res) => {
   }
 };
 
+// ----------------------apply to job-------------------
+// exports.applyJob = async (req,res) => {
+//   try {
+
+//     const jobid = req.params.id;
+
+//     const job = await JobModel.findById(jobid)
+
+//     if (!job) return res.status(404).json({ status: false, msg: 'job not found' })
+
+//     if (job.applicants.includes(req.user.id)) return res.status(400).json({ status: false, msg: 'already applied to this job' })
+
+//     job.applicants.push(req.user.id);
+//     await job.save()
+
+//     res.status(200).json({
+//       status: true,
+//       msg: "Applied successfully",
+//       job
+//     });
+//   } catch (error) {
+//     console.error("Error applying job:", error);
+//     res.status(500).json({ status: false, msg: "Server error" });
+//   }
+// };
 
 
-exports.applyJob = async (req,res) => {
+
+
+exports.applyJob = async (req, res) => {
   try {
+    const  jobId  = req.params.id;
+    const { name, email, resume, coverLetter } = req.body;
+    const userId = req.user.id;
 
-    const jobid = req.params.id;
+    console.log(userId, jobId)
 
-    const job = await JobModel.findById(jobid)
+    const existingApp = await Application.findOne({ job: jobId, user: userId });
+    if (existingApp) {
+      return res.status(400).json({ message: "You already applied for this job" });
+    }
 
-    if (!job) return res.status(404).json({ status: false, msg: 'job not found' })
-
-    if (job.applicants.includes(req.user.id)) return res.status(400).json({ status: false, msg: 'already applied to this job' })
-
-    job.applicants.push(req.user.id);
-    await job.save()
-
-    res.status(200).json({
-      status: true,
-      msg: "Applied successfully",
-      job
+    const application = new Application({
+      job: jobId,
+      user: userId,
+      name,
+      email,
+      resume,
+      coverLetter
     });
-  } catch (error) {
-    console.error("Error applying job:", error);
-    res.status(500).json({ status: false, msg: "Server error" });
+
+    await application.save();
+
+    res.status(201).json({ message: "Application submitted", application });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
+
+
+
+// --------------------------toggle status of job----------------------
+exports.toggleJobStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await JobModel.findById(id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    job.status = job.status === "active" ? "closed" : "active";
+    await job.save();
+
+    res.json({ message: `Job ${job.status} successfully`, job });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 
 

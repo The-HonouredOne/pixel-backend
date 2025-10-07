@@ -9,7 +9,7 @@ const signRefresh = (user) => jwt.sign({ id: user._id }, process.env.JWT_REFRESH
 // token generate-----------------------------------------
 const setTokens = async (user) => {
     const accessToken = signAccess(user);
-    const refreshToken = signRefresh(user);
+    const refreshToken = signRefresh(user);   
 
     user.refreshToken = refreshToken; 
     await user.save();
