@@ -18,6 +18,7 @@ const calculateSuspendedUntil = (duration) => {
     if (duration.endsWith("d")) suspendedUntil.setDate(suspendedUntil.getDate() + num);
     else if (duration.endsWith("h")) suspendedUntil.setHours(suspendedUntil.getHours() + num);
     else if (duration.endsWith("w")) suspendedUntil.setDate(suspendedUntil.getDate() + num * 7);
+    else if (duration.endsWith("m")) suspendedUntil.setMinutes(suspendedUntil.getMinutes() + num);
     else suspendedUntil.setDate(suspendedUntil.getDate() + num);
   } else if (typeof duration === "number") {
     suspendedUntil.setDate(suspendedUntil.getDate() + duration);
@@ -124,7 +125,7 @@ exports.reactivateEmployer = async (req, res) => {
 //       if (typeof duration === "string") {
 //         const num = parseInt(duration);
 
-      
+
 //         if (duration.endsWith("d")) {
 //           suspendedUntil.setDate(suspendedUntil.getDate() + num); // days
 //         } else if (duration.endsWith("h")) {
@@ -169,7 +170,7 @@ exports.reactivateEmployer = async (req, res) => {
 //       if (typeof duration === "string") {
 //         const num = parseInt(duration);
 
-      
+
 //         if (duration.endsWith("d")) {
 //           suspendedUntil.setDate(suspendedUntil.getDate() + num); // days
 //         } else if (duration.endsWith("h")) {
