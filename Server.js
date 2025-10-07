@@ -35,26 +35,26 @@ const Employer = require('./models/Employer');
 
 // Runs every minute (adjust to your needs)
 cron.schedule("* * * * *", async () => {
-  console.log("Cron fired at:", new Date());
   const now = new Date();
 
-  const suspendedUsers = await User.find({
-    status: "suspended",
-    suspendedUntil: { $lte: now },
-  });
+  // Reactivate expired Users
+  const users = await User.updateMany(
+    { status: "suspended", suspendedUntil: { $lte: now } },
+    { status: "active", suspendedUntil: null, suspensionReason: null }
+  );
 
-  console.log("Found suspended users ready to reactivate:", suspendedUsers.length);
+  // Reactivate expired Employers
+  const employers = await Employer.updateMany(
+    { status: "suspended", suspendedUntil: { $lte: now } },
+    { status: "active", suspendedUntil: null, suspensionReason: null }
+  );
 
-  if (suspendedUsers.length > 0) {
-    const result = await User.updateMany(
-      { _id: { $in: suspendedUsers.map(u => u._id) } },
-      { status: "active", suspendedUntil: null, suspensionReason: null }
+  if (users.modifiedCount || employers.modifiedCount) {
+    console.log(
+      `${users.modifiedCount} users and ${employers.modifiedCount} employers reactivated at ${now}`
     );
-    console.log("Users reactivated:", result.modifiedCount);
   }
 });
-
-
 
 
 
